@@ -1,30 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+import '@openzeppelin/contracts/access/Ownable.sol';
 import '../contracts/extensions/ERC721AQueryable.sol';
-import '../contracts/ERC721A.sol';
-contract BSOP is  ERC721A, ERC721AQueryable {
-    
-    mapping(address => bool) members;
 
+contract BSOP is ERC721AQueryable, Ownable {
     constructor() ERC721A('BSOP', 'BSOP') {
-        members[msg.sender] = true;
     }
 
-    function mint(uint256 quantity) external payable {
+    function mint(uint256 quantity) external onlyOwner payable {
         // `_mint`'s second argument now takes in a `quantity`, not a `tokenId`.
-        require(members[msg.sender]);
         _mint(msg.sender, quantity);
-    }
-
-    function addMember(address newMember) external {
-        require(members[msg.sender]);
-        members[newMember] = true;
-    }
-
-    function removeMember(address member) external {
-        require(members[msg.sender]);
-        delete members[member];
     }
 
     string private _baseTokenURI;
@@ -33,11 +19,11 @@ contract BSOP is  ERC721A, ERC721AQueryable {
         return _baseTokenURI;
     }
 
-    function setBaseURI(string calldata baseURI) external {
-        require(members[msg.sender]);
+    function setBaseURI(string calldata baseURI) external onlyOwner {
         _baseTokenURI = baseURI;
     }
-   function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256){
+
+    function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256){
         uint256 numMintedSoFar = _nextTokenId();
         uint256 tokenIdsIdx;
         address currOwnershipAddr;
@@ -63,6 +49,7 @@ contract BSOP is  ERC721A, ERC721AQueryable {
         }
         return 0;
     }
+
     function tokenByIndex(uint256 index) external view returns (uint256){
         uint256 numMintedSoFar = _nextTokenId();
         uint256 tokenIdsIdx;
@@ -82,7 +69,4 @@ contract BSOP is  ERC721A, ERC721AQueryable {
         }
         revert();
     }
-
-
-    
 }
