@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
 import '../contracts/extensions/ERC721AQueryable.sol';
